@@ -5,6 +5,11 @@
         <field>Account.S1_StoryA__c</field>
         <readable>true</readable>
     </fieldPermissions>
+    <fieldPermissions>
+        <editable>false</editable>
+        <field>Contact.S1_StoryB__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
     <hasActivationRequired>false</hasActivationRequired>
     <label>S2_Shared</label>
 </PermissionSet>

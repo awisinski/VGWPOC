@@ -14,4 +14,11 @@
         <shortDescription>S2_LabelC</shortDescription>
         <value>c</value>
     </labels>
+    <labels>
+        <fullName>S2_LabelD</fullName>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>S2_LabelD</shortDescription>
+        <value>D</value>
+    </labels>
 </CustomLabels>
