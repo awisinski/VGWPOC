@@ -21,4 +21,11 @@
         <shortDescription>S2_LabelD</shortDescription>
         <value>D</value>
     </labels>
+    <labels>
+        <fullName>S2_Story_E</fullName>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>S2 - Story E</shortDescription>
+        <value>E</value>
+    </labels>
 </CustomLabels>
