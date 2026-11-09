@@ -1,0 +1,62 @@
+name: Run Code Analyzer 5 Workflow
+
+# Dispatched by Lifecycle Center Testing (Code Analyzer v5 test provider).
+on:
+  workflow_dispatch:
+    inputs:
+      config_branch:
+        description: Branch that holds .github/workflows/config/code-analyzer-config.yml
+        required: false
+        type: string
+
+jobs:
+  code-analyzer:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out files
+        uses: actions/checkout@v4
+
+      - name: Check out config branch
+        if: ${{ inputs.config_branch != '' }}
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.config_branch }}
+          path: config-branch
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ">=20"
+
+      - name: Install Salesforce CLI
+        run: npm install -g @salesforce/cli@latest
+
+      - name: Install Code Analyzer plugin
+        run: sf plugins install code-analyzer@latest
+
+      - name: Check for config file
+        id: check-config-file
+        run: |
+          if [ -f config-branch/.github/workflows/config/code-analyzer-config.yml ]; then
+            echo "config_path=config-branch/.github/workflows/config/code-analyzer-config.yml" >> "$GITHUB_OUTPUT"
+            echo "config_exists=true" >> "$GITHUB_OUTPUT"
+          elif [ -f .github/workflows/config/code-analyzer-config.yml ]; then
+            echo "config_path=.github/workflows/config/code-analyzer-config.yml" >> "$GITHUB_OUTPUT"
+            echo "config_exists=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "config_exists=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Run Code Analyzer (with config)
+        if: ${{ steps.check-config-file.outputs.config_exists == 'true' }}
+        uses: forcedotcom/run-code-analyzer@v2
+        with:
+          run-arguments: --config-file ${{ steps.check-config-file.outputs.config_path }} --output-file results.html
+          results-artifact-name: salesforce-code-analyzer-v5-results
+
+      - name: Run Code Analyzer (default rules)
+        if: ${{ steps.check-config-file.outputs.config_exists != 'true' }}
+        uses: forcedotcom/run-code-analyzer@v2
+        with:
+          run-arguments: --output-file results.html
+          results-artifact-name: salesforce-code-analyzer-v5-results
