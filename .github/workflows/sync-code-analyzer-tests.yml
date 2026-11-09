@@ -1,33 +1,37 @@
 name: Sync Code Analyzer Tests Workflow
-on: workflow_dispatch
+
+# Dispatched by Lifecycle Center Testing when syncing the Code Analyzer v5 test provider.
+on:
+  workflow_dispatch:
+
 jobs:
-  salesforce-code-analyzer-workflow:
+  sync-tests:
     runs-on: ubuntu-latest
     steps:
       - name: Check out files
         uses: actions/checkout@v4
 
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ">=20"
+
       - name: Install Salesforce CLI
         run: npm install -g @salesforce/cli@latest
 
-      - name: Setup Code Analyzer 5
+      - name: Install Code Analyzer plugin
         run: sf plugins install code-analyzer
 
-      - name: Get Code Analyzer V5 rules
-        id: get-code-analyzer-rules
+      - name: Generate rules list
         run: |
           if [ -f .github/workflows/config/code-analyzer-config.yml ]; then
-            echo "Config file exists"
-            sf code-analyzer rules --config-file .github/workflows/config/code-analyzer-config.yml --rule-selector=all --output-file ca-v5-rules.json
+            sf code-analyzer rules --config-file .github/workflows/config/code-analyzer-config.yml --output-file ca-v5-rules.json
           else
-            echo "Config file does not exist -- Creating default test suites"
             sf code-analyzer rules --output-file ca-v5-rules.json
           fi
 
-      - uses: actions/upload-artifact@v4
+      - name: Upload rules list
+        uses: actions/upload-artifact@v4
         with:
-          name: code-analyser5-tests
-          path: ./ca-v5-rules.json
-
-
-          
+          name: code-analyzer5-tests
+          path: ca-v5-rules.json
